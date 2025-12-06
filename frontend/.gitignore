@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.sqlite
+/estudos.db
+.env
+
+# Frontend (Node/Vite)
+/frontend/node_modules
+/frontend/dist
