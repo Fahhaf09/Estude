@@ -51,10 +51,19 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Plataforma EdTech Modularizada")
 
+# --- CONFIGURAÇÃO DO CORS ---
+origins = [
+    "http://localhost:5173",             # Desenvolvimento local
+    "https://estude.onrender.com",       # Backend (Render)
+    "https://estude-git-main-santos09fah-gmailcoms-projects.vercel.app/.vercel.app" # <--- COLOQUE O LINK REAL QUE A VERCEL TE DEU AQUI
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://estude.onrender.com"],
-    allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
+    allow_origins=origins, 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # --- INCLUIR ROTAS MODULARIZADAS ---
