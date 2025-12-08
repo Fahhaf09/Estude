@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 // 🌐 URL de Produção (Modifique após o deploy do Backend)
 // Em produção, isso deve ser "https://seubackend.render.com"
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://estude.onrender.com";
 
 function Login() {
   const [email, setEmail] = useState("");
