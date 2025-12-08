@@ -55,11 +55,13 @@ app = FastAPI(title="Plataforma EdTech Modularizada")
 origins = [
     "http://localhost:5173",             # Desenvolvimento local
     "https://estude.onrender.com",       # Backend (Render)
-    "https://estude-git-main-santos09fah-gmailcoms-projects.vercel.app/.vercel.app" # <--- COLOQUE O LINK REAL QUE A VERCEL TE DEU AQUI
+    "https://estude-plataforma.vercel.app", # URL Principal (Produção)
 ]
 
 app.add_middleware(
     CORSMiddleware,
+    # allow_origin_regex permite autorizar qualquer subdomínio da Vercel associado ao seu projeto
+    allow_origin_regex=r"https://estude-.*-santos09fah-gmailcoms-projects\.vercel\.app",
     allow_origins=origins, 
     allow_credentials=True,
     allow_methods=["*"],
