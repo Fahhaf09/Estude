@@ -2,108 +2,121 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-// 🌐 URL de Produção (Modifique após o deploy do Backend)
-// Em produção, isso deve ser "https://seubackend.render.com"
 const API_BASE_URL = "https://estude.onrender.com";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState(""); 
-  const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [isCadastro, setIsCadastro] = useState(false);
+  
+  // Estado completo do formulário
+  const [formData, setFormData] = useState({
+    username: "", email: "", password: "",
+    first_name: "", last_name: "", gender: "Masculino",
+    cpf: "", phone_fixed: "", phone_mobile: "", state: "SP",
+    goal_vestibular: "", goal_course: "", goal_concurso: "",
+    perfil: "vestibular" // 'vestibular' ou 'concurso'
+  });
 
-const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      // Usa a URL base para LOGIN
-      const res = await axios.post(API_BASE_URL + "/login", { email, password });
- 
-      localStorage.setItem("user", JSON.stringify(res.data)); 
- 
-      console.log("Login OK. Dados salvos:", res.data);
- 
-      navigate("/dashboard");
- 
-    } catch (err) {
-      alert("Erro no login! Verifique email e senha.");
-    }
-  };
-  
-  const handleCadastro = async () => {
-    // Validação simples
-    if (!username || !email || !password) {
-        alert("Preencha Nome, Email e Senha para cadastrar!");
-        return;
-    }
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    try {
-      // MUDANÇA AQUI: Agora usa API_BASE_URL para o cadastro
-      await axios.post(API_BASE_URL + "/cadastro", { 
-        username: username,
-        email: email, 
-        password: password, 
-        state: "SP"
-      });
-      alert(`Usuário ${username} cadastrado! Agora clique em ENTRAR.`);
-    } catch (err) {
-      // Mostra o erro real se possível
-      console.error(err);
-      alert("Erro ao cadastrar. O Email ou o Nome já existem!");
-    }
-  };
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    const endpoint = isCadastro ? "/cadastro" : "/login";
+    
+    // Payload simplificado para login ou completo para cadastro
+    const payload = isCadastro ? formData : { email: formData.email, password: formData.password };
 
-  return (
-    <div style={{ padding: 50, maxWidth: "400px", margin: "0 auto", textAlign: "center" }}>
-      <h2>Acesso à Plataforma</h2>
-      
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {/* Campo de Nome (Novo) */}
-        <input 
-            type="text" 
-            placeholder="Seu Nome (Apenas para cadastro)" 
-            value={username} 
-            onChange={e => setUsername(e.target.value)}
-            style={{ padding: 10 }} 
-        />
+    try {
+      const res = await axios.post(API_BASE_URL + endpoint, payload);
+      if (!isCadastro) {
+        localStorage.setItem("user", JSON.stringify(res.data));
+        navigate("/dashboard");
+      } else {
+        alert("Cadastro realizado com sucesso! Faça seu login.");
+        setIsCadastro(false);
+      }
+    } catch (err) {
+      alert("Erro na operação. Verifique os dados ou se o CPF/E-mail já existem.");
+    }
+  };
 
-        <input 
-            type="email" 
-            placeholder="Seu Email" 
-            value={email} 
-            onChange={e => setEmail(e.target.value)} 
-            style={{ padding: 10 }}
-        />
-        
-        <input 
-            type="password" 
-            placeholder="Sua Senha" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            style={{ padding: 10 }}
-        />
-      </div>
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f7f6', fontFamily: 'Inter, sans-serif' }}>
+      
+      {/* LADO ESQUERDO: MARKETING (Oculto no mobile se desejar) */}
+      <div style={{ flex: 0.6, backgroundColor: '#1f2937', color: 'white', padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <h1 style={{ color: '#6C63FF' }}>🧠 PLATAFORMA ELO</h1>
+        <p>"A educação é o passaporte para o futuro."</p>
+        <div style={{ marginTop: '20px', borderLeft: '4px solid #6C63FF', paddingLeft: '20px' }}>
+          <h4>Nossos Planos</h4>
+          <p>• Padrão: 7 questões/dia<br/>• Premium: Ilimitado + IA<br/>• Avançado: Mentoria</p>
+        </div>
+      </div>
 
-      <br/>
+      {/* LADO DIREITO: FORMULÁRIO */}
+      <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+        <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <h2 style={{ textAlign: 'center' }}>{isCadastro ? 'Cadastro Completo' : 'Login'}</h2>
 
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <button 
-            onClick={handleLogin}
-            style={{ padding: "10px 30px", backgroundColor: "#4CAF50", color: "white", border: "none", cursor: "pointer" }}
-        >
-            ENTRAR
-        </button>
-        
-        <button 
-            onClick={handleCadastro} 
-            style={{ padding: "10px 30px", backgroundColor: "#2196F3", color: "white", border: "none", cursor: "pointer" }}
-        >
-            CADASTRAR
-        </button>
-      </div>
-      
-      <p style={{fontSize: "12px", color: "gray"}}>*Para entrar, basta Email e Senha. Para cadastrar, preencha o Nome também.</p>
-    </div>
-  );
+          <form onSubmit={handleAuth}>
+            {isCadastro ? (
+              <>
+                <div className="grid-2">
+                  <input type="text" name="first_name" placeholder="Nome" onChange={handleChange} required />
+                  <input type="text" name="last_name" placeholder="Sobrenome" onChange={handleChange} required />
+                </div>
+                <div className="grid-2">
+                   <select name="gender" onChange={handleChange} style={inputStyle}>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                  <input type="text" name="cpf" placeholder="CPF" onChange={handleChange} required />
+                </div>
+                <div className="grid-2">
+                  <input type="text" name="phone_fixed" placeholder="Fixo" onChange={handleChange} />
+                  <input type="text" name="phone_mobile" placeholder="Celular" onChange={handleChange} required />
+                </div>
+                <input type="text" name="username" placeholder="Nome de Usuário (Nick)" onChange={handleChange} required />
+                
+                <h4 style={{marginTop: '20px'}}>Foco de Estudo</h4>
+                <div style={{display: 'flex', gap: '10px', marginBottom: '15px'}}>
+                   <button type="button" onClick={() => setFormData({...formData, perfil: 'vestibular'})} style={formData.perfil === 'vestibular' ? btnActive : btnInactive}>Vestibular</button>
+                   <button type="button" onClick={() => setFormData({...formData, perfil: 'concurso'})} style={formData.perfil === 'concurso' ? btnActive : btnInactive}>Concurso</button>
+                </div>
+
+                {formData.perfil === 'vestibular' ? (
+                  <div className="grid-2">
+                    <input type="text" name="goal_vestibular" placeholder="Qual Vestibular?" onChange={handleChange} />
+                    <input type="text" name="goal_course" placeholder="Qual Curso?" onChange={handleChange} />
+                  </div>
+                ) : (
+                  <input type="text" name="goal_concurso" placeholder="Qual Concurso Almejado?" onChange={handleChange} />
+                )}
+              </>
+            ) : null}
+
+            <input type="email" name="email" placeholder="E-mail" onChange={handleChange} required />
+            <input type="password" name="password" placeholder="Senha" onChange={handleChange} required />
+
+            <button type="submit" className="btn-primary" style={{marginTop: '20px'}}>
+              {isCadastro ? 'SALVAR CADASTRO' : 'ENTRAR'}
+            </button>
+          </form>
+
+          <p style={{ textAlign: 'center', marginTop: '20px' }}>
+            <a href="#" onClick={() => setIsCadastro(!isCadastro)} style={{ color: '#6C63FF', fontWeight: 'bold' }}>
+              {isCadastro ? 'Voltar para Login' : 'Criar Nova Conta'}
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+const inputStyle = { width: '100%', padding: '12px', margin: '8px 0', border: '2px solid #e0e0e0', borderRadius: '8px' };
+const btnActive = { backgroundColor: '#6C63FF', color: 'white', flex: 1 };
+const btnInactive = { backgroundColor: '#e0e0e0', color: '#666', flex: 1 };
 
 export default Login;

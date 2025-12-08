@@ -12,6 +12,17 @@ class User(Base):
     state = Column(String(2))
     current_xp = Column(Float, default=1000.0) # ELO do Aluno (Float)
     current_level = Column(Integer, default=1)
+    first_name = Column(String)
+    last_name = Column(String)
+    gender = Column(String)
+    cpf = Column(String, unique=True)
+    phone_fixed = Column(String)
+    phone_mobile = Column(String)
+    state = Column(String(2))
+    # Perfilamento
+    goal_vestibular = Column(String) # Ex: ENEM, FUVEST
+    goal_course = Column(String)     # Ex: Medicina, Engenharia
+    goal_concurso = Column(String)   # Ex: PF, Banco do Brasil
     
     # --- NOVOS CAMPOS PARA ASSINATURA ---
     subscription_tier = Column(String, default='FREE') # 'FREE' ou 'PREMIUM'
