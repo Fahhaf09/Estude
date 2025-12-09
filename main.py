@@ -10,12 +10,12 @@ from datetime import datetime
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
 client = None
 if GEMINI_API_KEY:
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-    except Exception as e:
-        client = None
-else:
-    print("ATENÇÃO: Variável GEMINI_API_KEY não está configurada.")
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+    except Exception as e:
+        client = None
+else: 
+    print("ATENÇÃO: Variável GEMINI_API_KEY não encontrada.")
 
 # --- CONSTANTES GLOBAIS ---
 K_FACTOR_ALUNO = 32
