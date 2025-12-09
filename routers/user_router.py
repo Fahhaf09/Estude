@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 import models, database
 
-router = APIRouter(tags=["Users and Monetization"])
+router = APIRouter(tags=["Users & Ranking"])
 
 # Rota para obter perfil, ranking e subscribe
 
@@ -25,16 +25,25 @@ def ler_perfil(user_id: int, db: Session = Depends(database.get_db)):
     }
 
 @router.get("/ranking")
-def obter_ranking(estado: str = None, db: Session = Depends(database.get_db)):
-    # ... (Copie aqui o código completo da rota /ranking do seu main.py) ...
+def obter_ranking(state: str = None, db: Session = Depends(database.get_db)):
     query = db.query(models.User)
-    if estado and estado != "null":
-        query = query.filter(models.User.state == estado)
-    top_alunos = query.order_by(desc(models.User.current_xp)).limit(10).all()
-    ranking_formatado = []
-    for i, aluno in enumerate(top_alunos):
-        ranking_formatado.append({"posicao": i + 1, "username": aluno.username, "xp": aluno.current_xp, "level": aluno.current_level, "state": aluno.state})
-    return ranking_formatado
+    
+    # Se o parâmetro state for enviado, filtra por ele
+    if state:
+        query = query.filter(models.User.state == state.upper())
+    
+    # Ordena pelo XP mais alto e pega os top 10
+    ranking = query.order_by(desc(models.User.current_xp)).limit(10).all()
+    
+    return [
+        {
+            "posicao": idx + 1,
+            "username": user.username,
+            "xp": round(user.current_xp, 1),
+            "level": user.current_level,
+            "state": user.state
+        } for idx, user in enumerate(ranking)
+    ]
 
 @router.post("/subscribe/{user_id}")
 def ativar_premium(user_id: int, db: Session = Depends(database.get_db)):

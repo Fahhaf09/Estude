@@ -48,7 +48,7 @@ function Login() {
         <h1 style={{ color: '#6C63FF' }}>🧠 PLATAFORMA ELO</h1>
         <p>"A educação é o passaporte para o futuro."</p>
         <div style={{ marginTop: '20px', borderLeft: '4px solid #6C63FF', paddingLeft: '20px' }}>
-          <h4>Nossos Planos</h4>
+          <h4>Planos</h4>
           <p>• Padrão: 7 questões/dia<br/>• Premium: Ilimitado + IA<br/>• Avançado: Mentoria</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ function Login() {
                   <input type="text" name="phone_mobile" placeholder="Celular" onChange={handleChange} required />
                 </div>
                 <input type="text" name="username" placeholder="Nome de Usuário (Nick)" onChange={handleChange} required />
-                
+                <input type="text" name="estado" placeholder="Estado" onChange={handleChange} required />
                 <h4 style={{marginTop: '20px'}}>Foco de Estudo</h4>
                 <div style={{display: 'flex', gap: '10px', marginBottom: '15px'}}>
                    <button type="button" onClick={() => setFormData({...formData, perfil: 'vestibular'})} style={formData.perfil === 'vestibular' ? btnActive : btnInactive}>Vestibular</button>
