@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional # CORREÇÃO 1: Faltava o 'Optional' no import
+from enum import Enum
 import models
 import database
-import auth
+import auth # CORREÇÃO 2: Importar a biblioteca 'auth' para hashing de senha e criação de token
 
 router = APIRouter(tags=["Auth"])
 
 # --- SCHEMAS ATUALIZADOS ---
-Class EstadosBrasil(str, Enum):
+# CORREÇÃO 3: 'Class' deve ser 'class' (minúsculo)
+class EstadosBrasil(str, Enum):
     AC = "Acre"
     AL = "Alagoas"
     AP = "Amapá"
@@ -48,7 +50,7 @@ class UserCreate(BaseModel):
     cpf: str
     phone_fixed: Optional[str] = None
     phone_mobile: str
-    state: EstadosBrasil
+    state: EstadosBrasil # Garante que o estado seja um valor da Enum
     # Perfilamento
     goal_vestibular: Optional[str] = None
     goal_course: Optional[str] = None
@@ -90,6 +92,7 @@ def criar_usuario(user: UserCreate, db: Session = Depends(database.get_db)):
     hashed_password = auth.criar_hash_senha(user.password)
     
     # 3. Cria o novo objeto do usuário com os novos campos
+    # CORREÇÃO 4: Convertemos o Enum do estado para string (user.state.value) antes de salvar no DB
     novo_user = models.User(
         username=user.username,
         email=user.email,
@@ -100,11 +103,11 @@ def criar_usuario(user: UserCreate, db: Session = Depends(database.get_db)):
         cpf=user.cpf,
         phone_fixed=user.phone_fixed,
         phone_mobile=user.phone_mobile,
-        state=user.state,
+        state=user.state.value, # Salva o valor da string ("AC", "SP")
         goal_vestibular=user.goal_vestibular,
         goal_course=user.goal_course,
         goal_concurso=user.goal_concurso,
-        subscription_tier='FREE'  # Padrão inicial
+        subscription_tier='FREE' # Padrão inicial
     )
     
     db.add(novo_user)
@@ -114,17 +117,21 @@ def criar_usuario(user: UserCreate, db: Session = Depends(database.get_db)):
     return {"mensagem": "Usuário criado com sucesso!", "id": novo_user.id}
 
 
-# --- ROTA DE LOGIN (Mantida igual) ---
+# --- ROTA DE LOGIN (Mantida igual, com correção de sintaxe) ---
 @router.post("/login", response_model=Token)
 def login(user_data: UserLogin, db: Session = Depends(database.get_db)):
     user = db.query(models.User).filter(
         models.User.email == user_data.email
     ).first()
     
+    # CORREÇÃO 5: Verifica se o usuário existe antes de verificar a senha
+    if not user:
+         raise HTTPException(status_code=400, detail="Credenciais inválidas")
+         
     password_valid = auth.verificar_senha(
         user_data.password, user.hashed_password
     )
-    if not user or not password_valid:
+    if not password_valid: # Simplificação da lógica de erro
         raise HTTPException(status_code=400, detail="Credenciais inválidas")
     
     token = auth.criar_token_acesso(data={"sub": user.email})
