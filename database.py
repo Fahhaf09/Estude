@@ -3,16 +3,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./estudos.db")
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
 
-print(f"URL de Conexão Lida: {SQLALCHEMY_DATABASE_URL}") # <--- ADICIONE ESTA LINHA TEMPORARIAMENTE
-
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+# Verifica se a URL do banco existe
+if DATABASE_URL is None:
+    # Se não houver URL de produção, usa SQLite local (Para desenvolvimento/teste)
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./estudos.db"
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
     )
 else:
-    # Para PostgreSQL, geralmente não precisa de connect_args.
+    # Render (PostgreSQL)
+    SQLALCHEMY_DATABASE_URL = DATABASE_URL
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
     
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
