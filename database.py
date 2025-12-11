@@ -1,9 +1,12 @@
+# database.py
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
+import os  # <-- CORREÇÃO CRÍTICA: Importar o módulo OS para ler variáveis de ambiente
 
-SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
+# LER VARIÁVEL DE AMBIENTE DO RENDER
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 # Verifica se a URL do banco existe
 if DATABASE_URL is None:
