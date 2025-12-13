@@ -55,7 +55,7 @@ app = FastAPI(title="Plataforma Estude Modularizada")
 # 3. CONFIGURAÇÃO DO CORS (USANDO APENAS REGEX)
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost:5173|estude\.onrender\.com|estude-gamma\.vercel\.app|estude-.*-santos09fah-gmailcoms-projects\.vercel\.app)",    allow_credentials=True,
+    allow_origin_regex=r"https?://(localhost:5173|estude\.onrender\.com|estude-gamma\.vercel\.app|estude-.*-santos09fah-gmailcoms-projects\.vercel\.app)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
