@@ -9,26 +9,30 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    state = Column(String())
+    
+    # 🚨 CORREÇÃO: Removida a linha duplicada 'state = Column(String())'
+    
     current_xp = Column(Float, default=0.0) # ELO do Aluno (Float)
     current_level = Column(Integer, default=1)
+    
+    # --- NOVOS CAMPOS DE CADASTRO ---
     first_name = Column(String)
     last_name = Column(String)
     gender = Column(String)
     cpf = Column(String, unique=True)
     phone_fixed = Column(String)
     phone_mobile = Column(String)
-    state = Column(String(2))
+    state = Column(String(2)) # DEFINIÇÃO ÚNICA E CORRETA para siglas (ex: 'SP', 'RJ')
+    
     # Perfilamento
     goal_vestibular = Column(String) # Ex: ENEM, FUVEST
     goal_course = Column(String)     # Ex: Medicina, Engenharia
     goal_concurso = Column(String)   # Ex: PF, Banco do Brasil
     
-    # --- NOVOS CAMPOS PARA ASSINATURA ---
+    # --- CAMPOS DE ASSINATURA ---
     subscription_tier = Column(String, default='FREE') # 'FREE' ou 'PREMIUM'
     daily_questions_count = Column(Integer, default=0)
     last_login_date = Column(DateTime, default=datetime.utcnow)
-    # -----------------------------------
     
     attempts = relationship("UserAttempt", back_populates="student")
     badges = relationship("Badge", back_populates="student")
