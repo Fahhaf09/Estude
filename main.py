@@ -1,68 +1,42 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import models, database
-from routers import auth_router, user_router, quiz_router
-import os, math, random 
-import google.genai as genai
-from datetime import datetime
+from routers import auth_router # Importe seus roteadores, se necessário
+from routers import admin_router # Exemplo de outro roteador
+from routers import question_router # Exemplo de outro roteador
 
-# --- CONFIGURAÇÃO DA GEMINI ---
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
-client = None
-if GEMINI_API_KEY:
-    try: # <--- O ERRO U+00A0 ESTAVA NO ESPAÇO ANTES DESTE 'try'
-        client = genai.Client(api_key=GEMINI_API_KEY)
-    except Exception as e:
-        client = None
-else:
-    print("ATENÇÃO: Variável GEMINI_API_KEY não está configurada.")
-
-# --- CONSTANTES GLOBAIS ---
-K_FACTOR_ALUNO = 32
-K_FACTOR_QUESTAO = 16
-
-# --- FUNÇÕES DE SERVIÇO (ELO/GEMINI) ---
-
-def calcular_probabilidade_acerto(habilidade_aluno, dificuldade_questao):
-    return 1.0 / (1 + 10 ** ((dificuldade_questao - habilidade_aluno) / 400))
-
-def atualizar_habilidade_elo(habilidade_atual, dificuldade_questao, acertou, k_factor):
-    resultado_real = 1 if acertou else 0
-    probabilidade_esperada = calcular_probabilidade_acerto(habilidade_atual, dificuldade_questao)
-    nova_habilidade = habilidade_atual + k_factor * (resultado_real - probabilidade_esperada)
-    return round(nova_habilidade, 2)
-
-def gerar_feedback_ia(pergunta, resposta_aluno, resposta_correta, acertou, subject, topic):
-    if client is None:
-        if acertou: return f"IA Simulada: Excelente! Você dominou o tópico de {topic}."
-        else: return f"IA Simulada: Reveja o conceito de {topic} em {subject}. A resposta correta é: {resposta_correta}."
-    prompt = f"""Atue como um professor didático. Você está corrigindo uma questão de {subject} sobre {topic}.
-    Resposta do Aluno: {resposta_aluno} | Resposta Correta: {resposta_correta}"""
-    try:
-        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
-        return response.text
-    except Exception as e:
-        return "Desculpe, a IA Gemini está indisponível no momento."
-
-# ---------------------------------------------------------------------------------------
-
-# 1. CRIAÇÃO DE TABELAS (Executar APENAS uma vez)
-models.Base.metadata.create_all(bind=database.engine)
-
-# 2. INICIALIZAÇÃO DO APP
+# 1. INICIALIZAÇÃO DO APP
 app = FastAPI(title="Plataforma Estude Modularizada")
 
-# 3. CONFIGURAÇÃO DO CORS (USANDO APENAS REGEX)
+# --- CONFIGURAÇÃO FINAL DO CORS ---
+# Liste explicitamente todos os domínios que podem acessar a API (Backend)
+origins = [
+    "http://localhost:5173",                     # Ambiente de desenvolvimento local (Vite/React)
+    "http://127.0.0.1:5173",                     # Outra forma de localhost
+    "https://estude-gamma.vercel.app",           # SEU DOMÍNIO VERCEL PRINCIPAL
+    "https://estude.onrender.com",               # SEU DOMÍNIO RENDER (self-reference)
+    # Adicione abaixo qualquer domínio de preview da Vercel que você use
+    "https://estude-preview.vercel.app",
+    "https://estude-.*-santos09fah-gmailcoms-projects.vercel.app", 
+]
+
+# 2. APLICAÇÃO DO CORS MIDDLEWARE
+# Este é o ponto crucial: Ele adiciona os cabeçalhos de CORS a *toda* resposta.
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost:5173|estude\.onrender\.com|estude-gamma\.vercel\.app|estude-.*-santos09fah-gmailcoms-projects\.vercel\.app)",
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],    # Permite GET, POST, OPTIONS, etc.
+    allow_headers=["*"],    # Permite Authorization, Content-Type, etc.
 )
+# ------------------------------------
 
-# --- INCLUIR ROTAS MODULARIZADAS ---
-
+# 3. INCLUSÃO DOS ROTAS (Importe conforme seu projeto)
 app.include_router(auth_router.router)
-app.include_router(user_router.router)
-app.include_router(quiz_router.router)
+# app.include_router(admin_router.router)
+# app.include_router(question_router.router)
+# ... inclua outros roteadores aqui
+
+# Rota Raiz (Útil para saber se o servidor está no ar)
+@app.get("/")
+def read_root():
+    return {"message": "Backend Estude Online está ativo e CORS configurado."}
