@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth_router # Importe seus roteadores, se necessário
-from routers import admin_router # Exemplo de outro roteador
-from routers import question_router # Exemplo de outro roteador
+from routers import auth_router, user_router, quiz_router
 
 # 1. INICIALIZAÇÃO DO APP
 app = FastAPI(title="Plataforma Estude Modularizada")
@@ -32,9 +30,9 @@ app.add_middleware(
 
 # 3. INCLUSÃO DOS ROTAS (Importe conforme seu projeto)
 app.include_router(auth_router.router)
-# app.include_router(admin_router.router)
-# app.include_router(question_router.router)
-# ... inclua outros roteadores aqui
+app.include_router(user_router.router)
+app.include_router(quiz_router.router)
+
 
 # Rota Raiz (Útil para saber se o servidor está no ar)
 @app.get("/")
