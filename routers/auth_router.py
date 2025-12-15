@@ -11,6 +11,7 @@ router = APIRouter(tags=["Auth"])
 
 # --- SCHEMAS ATUALIZADOS ---
 # CORREÇÃO 3: 'Class' deve ser 'class' (minúsculo)
+
 class EstadosBrasil(str, Enum):
     AC = "Acre"
     AL = "Alagoas"
@@ -49,7 +50,7 @@ class UserCreate(BaseModel):
     gender: str
     cpf: str
     phone_fixed: Optional[str] = None
-    phone_mobile: str
+    phone_mobile: str 
     state: EstadosBrasil # Garante que o estado seja um valor da Enum
     # Perfilamento
     goal_vestibular: Optional[str] = None

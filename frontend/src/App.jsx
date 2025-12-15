@@ -1,28 +1,32 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import Cadastro from "./pages/Cadastro"; 
 import Dashboard from "./pages/Dashboard";
-import Quiz from "./pages/Quiz"; // <--- Importe o Quiz
-import Ranking from "./pages/Ranking"; // <--- Importe aqui
-import Upgrade from "./pages/Upgrade"; // <--- NOVO IMPORT
-import AdminPanel from "./pages/AdminPanel"; // <--- NOVO IMPORT
-import StudyArea from "./pages/StudyArea"; // <--- NOVO IMPORT
+import Quiz from "./pages/Quiz";
+import Ranking from "./pages/Ranking";
+import Upgrade from "./pages/Upgrade";
+import AdminPanel from "./pages/AdminPanel";
+import StudyArea from "./pages/StudyArea"; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ROTAS PRINCIPAIS (Não dinâmicas) */}
         <Route path="/" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} /> 
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* Rota com o parâmetro dinâmico para a trilha */}
-        <Route path="/quiz/:trilha" element={<Quiz />} /> 
         <Route path="/ranking" element={<Ranking />} />
-        <Route path="/upgrade" element={<Upgrade />} /> {/* <--- NOVA ROTA */}
-        <Route path="/admin" element={<AdminPanel />} /> {/* <--- NOVA ROTA */}
-        {/* Rota para a seleção de Áreas/Disciplinas */}
+        <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        
+        {/* ROTAS DINÂMICAS (Com parâmetros) */}
+        {/* Rota para a área de estudo com parâmetro da trilha (ex: /study/VESTIBULAR) */}
         <Route path="/study/:trilha" element={<StudyArea />} /> 
-        {/* A rota do Quiz também será atualizada no PASSO 3 para receber mais filtros */}
+        
+        {/* Rota do Quiz com o parâmetro da trilha */}
         <Route path="/quiz/:trilha" element={<Quiz />} /> 
-        {/* ... */}
+        
       </Routes>
     </BrowserRouter>
   );
