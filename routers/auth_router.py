@@ -112,7 +112,7 @@ def criar_usuario(user: UserCreate, db: Session = Depends(database.get_db)):
         level=1, 
         xp=0.0,
         current_elo=1000.0, # Se você estiver usando ELO
-        daily_questions_count=0
+        daily_questions_count=0,
     )
     
     db.add(novo_user)
