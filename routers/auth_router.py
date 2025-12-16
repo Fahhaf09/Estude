@@ -141,11 +141,11 @@ def login(user_data: UserLogin, db: Session = Depends(database.get_db)):
     
     token = auth.criar_token_acesso(data={"sub": user.email})
     return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_id": user.id,
-        "username": user.username,
-        "state": user.state,
-        "level": user.level,   # <--- CORRIGIDO
-        "xp": user.xp          # <--- CORRIGIDO
-    }
+        
+        "access_token": token,
+        "user_id": user.id,
+        "username": user.username,
+        "state": user.state,
+        "level": user.level,
+        "xp": user.xp,
+    }
