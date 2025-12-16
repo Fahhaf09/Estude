@@ -109,6 +109,10 @@ def criar_usuario(user: UserCreate, db: Session = Depends(database.get_db)):
         goal_course=user.goal_course,
         goal_concurso=user.goal_concurso,
         subscription_tier='FREE' # Padrão inicial
+        level=1, 
+        xp=0.0,
+        current_elo=1000.0, # Se você estiver usando ELO
+        daily_questions_count=0
     )
     
     db.add(novo_user)
@@ -137,11 +141,11 @@ def login(user_data: UserLogin, db: Session = Depends(database.get_db)):
     
     token = auth.criar_token_acesso(data={"sub": user.email})
     return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_id": user.id,
-        "username": user.username,
-        "state": user.state,
-        "level": user.current_level,
-        "xp": user.current_xp
-    }
+        "access_token": token,
+        "token_type": "bearer",
+        "user_id": user.id,
+        "username": user.username,
+        "state": user.state,
+        "level": user.level,   # <--- CORRIGIDO
+        "xp": user.xp          # <--- CORRIGIDO
+    }
